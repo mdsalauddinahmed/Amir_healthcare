@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 // Best practice: declare prisma as a global variable to prevent multiple instances
 declare global {
@@ -14,26 +14,25 @@ if (process.env.NODE_ENV !== "production") {
     global.prisma = prisma;
 }
 
-const getAllfromAdmin = async () => {
+const getAllfromAdmin = async (params:any) => {
+    console.log(params);
     try {
-        const result = await prisma.admin.findMany({
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                contactNumber: true,
-                createdAt: true,
-                updatedAt: true,
-                user: {
-                    select: {
-                        role: true,
-                        status: true
-                    }
+       const andCondions: Prisma.AdminWhereInput[] = [];
+
+    //console.log(filterData);
+    if (params.searchTerm) {
+        andCondions.push({
+            OR:  ["name","email"].map(field => ({
+                [field]: {
+                    contains: params.searchTerm,
+                    mode: 'insensitive'
                 }
-            },
-            where: {
-                isDeleted: false
-            }
+            }))
+        })
+    };
+  const whereConditons: Prisma.AdminWhereInput = { AND: andCondions }
+        const result = await prisma.admin.findMany({
+            where: whereConditons
         });
         return result;
     } catch (error) {

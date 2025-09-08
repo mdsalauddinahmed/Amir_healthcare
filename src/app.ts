@@ -11,9 +11,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Application Routes
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/admins', AdminRoutes);
+// // Application Routes
+// app.use('/api/v1/users', userRoutes);
+// app.use('/api/v1/admins', AdminRoutes);
 
 // Base route
 app.get('/', (req, res) => {

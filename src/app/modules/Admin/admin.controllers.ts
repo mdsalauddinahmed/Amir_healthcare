@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 
 const getAllfromDB = async (req: Request, res: Response) => {
     try {
-        const result = await adminservice.getAllfromAdmin();
+        const result = await adminservice.getAllfromAdmin(req.query);
         // console.log(result)
         res.status(200).json({
             success: true,
