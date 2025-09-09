@@ -6,6 +6,7 @@ const router = express.Router();
  
 
 router.get('/',Admincontroller.getAllfromDB)
+router.get('/:id',Admincontroller.getAdminById)
 
 export const AdminRoutes = router;
  
