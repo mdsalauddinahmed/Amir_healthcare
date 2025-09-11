@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, UserStatus, type Admin } from '@prisma/client';
 import { paginationHelper } from '../../../helpers/paginationHelper.js';
 
 // Best practice: declare prisma as a global variable to prevent multiple instances
@@ -81,15 +81,102 @@ const getAllfromAdmin = async (params:any,options:any ) => {
     }
 };
 
-const getAdminById = async (id: string) => {
+const getAdminById = async (id: string): Promise<Admin | null> => {
  
         const admin = await prisma.admin.findUnique({
-            where: { id },
+            where: { id,isDeleted: false },
         })
         return admin;
     }
 
+
+const updateIntoDB = async (id: string, payload: Partial<Admin>): Promise<Admin> => {
+    // Remove email from the payload as it shouldn't be updated directly
+    const { email, ...data } = payload; 
+
+    const isExist=await prisma.admin.findUniqueOrThrow({
+        where:{id}
+    })
+
+    const result = await prisma.admin.update({
+        where: {
+            id,
+            isDeleted: false
+        },
+        data
+    });
+
+    return result;
+};
+
+const deletedAdmin= async (id: string): Promise<Admin | null> => {
+
+    await prisma.admin.findUniqueOrThrow({
+        where: {
+            id
+        }
+    });
+
+    const result = await prisma.$transaction(async (transactionClient) => {
+        const adminDeletedData = await transactionClient.admin.delete({
+            where: {
+                id,
+                isDeleted: false
+            }
+        });
+
+        await transactionClient.user.delete({
+            where: {
+                email: adminDeletedData.email
+            }
+        });
+
+        return adminDeletedData;
+    });
+
+    return result;
+}
+
+
+const softDeleteFromDB = async (id: string): Promise<Admin | null> => {
+    await prisma.admin.findUniqueOrThrow({
+        where: {
+            id,
+            isDeleted: false
+        }
+    });
+
+    const result = await prisma.$transaction(async (transactionClient) => {
+        const adminDeletedData = await transactionClient.admin.update({
+            where: {
+                id
+            },
+            data: {
+                isDeleted: true
+            }
+        });
+
+        await transactionClient.user.update({
+            where: {
+                email: adminDeletedData.email
+            },
+            data: {
+                status: UserStatus.DELETED
+            }
+        });
+
+        return adminDeletedData;
+    });
+
+    return result;
+}
+
+
 export const adminservice = {
     getAllfromAdmin,
-    getAdminById
+    getAdminById,
+    updateIntoDB,
+    deletedAdmin,
+    softDeleteFromDB
+    
 };

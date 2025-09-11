@@ -1,19 +1,15 @@
-import  express  from "express";
+import express from "express";
+import type { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import userRoutes from "./app/modules/User/user.routes.js";
-import { AdminRoutes } from "./app/modules/Admin/admin.routes.js";
- 
-
+import routes from "./app/routes/index.js";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
+import { StatusCodes } from "http-status-codes";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// // Application Routes
-// app.use('/api/v1/users', userRoutes);
-// app.use('/api/v1/admins', AdminRoutes);
 
 // Base route
 app.get('/', (req, res) => {
@@ -22,8 +18,22 @@ app.get('/', (req, res) => {
     });
 });
 
-// User routes
-app.use('/api/users', userRoutes);
-app.use('/api/admins', AdminRoutes);
+// Application Routes
+app.use('/api/v1', routes);
+ 
+app.use(globalErrorHandler)
+
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "API NOT FOUND!",
+        error: {
+            path: req.originalUrl,
+            message: "Your requested path is not found!"
+        }
+    })
+})
+
 
 export default app;
