@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient, UserStatus, type Admin } from '@prisma/client';
 import { paginationHelper } from '../../../helpers/paginationHelper.js';
+import type { IAdminFilterRequest } from './admin.interface.js';
+import type { IPaginationOptions } from '../../Interfaces/pagination.js';
 
 // Best practice: declare prisma as a global variable to prevent multiple instances
 declare global {
@@ -15,7 +17,7 @@ if (process.env.NODE_ENV !== "production") {
     global.prisma = prisma;
 }
 
-const getAllfromAdmin = async (params:any,options:any ) => {
+const getAllfromAdmin = async (params:IAdminFilterRequest,options:IPaginationOptions ) => {
     // console.log(params);
     try {
        const andCondions: Prisma.AdminWhereInput[] = [];
