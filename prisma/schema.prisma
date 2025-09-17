@@ -43,7 +43,20 @@ model Admin {
 
   @@map("admins")
 }
-
+model OCRResult {
+  id          Int      @id @default(autoincrement())
+  fileName    String
+  extractedText String
+  createdAt   DateTime @default(now())
+  @@map("ocr_results")
+}
+model Message {
+  id         Int      @id @default(autoincrement())
+  text       String
+  prediction String
+  createdAt  DateTime @default(now())
+  @@map("messages")
+}
 model Doctor {
   id                  String              @id @default(uuid())
   name                String

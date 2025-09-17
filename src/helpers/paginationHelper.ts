@@ -1,3 +1,5 @@
+import type { IPaginationOptions } from "../app/Interfaces/pagination.js"
+
 type IOptions = {
     page?: number,
     limit?: number,
@@ -13,7 +15,7 @@ type IOptionsResult = {
     sortOrder: string
 }
 
-const calculatePagination = (options: IOptions): IOptionsResult => {
+const calculatePagination = (options:IPaginationOptions): IOptionsResult => {
 
     const page: number = Number(options.page) || 1;
     const limit: number = Number(options.limit) || 10;

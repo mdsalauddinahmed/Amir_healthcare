@@ -2,6 +2,7 @@ import { PrismaClient, UserRole } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 // Best practice: declare prisma as a global variable to prevent multiple instances
+  
 declare global {
     var prisma: PrismaClient | undefined;
 }
